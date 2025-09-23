@@ -9,8 +9,8 @@ import SwiftUI
 import UIKit
 
 public struct CameraView: View {
-    fileprivate enum Destination: Hashable {
-        case edit(image: UIImage)
+    public enum Destination: Hashable {
+        case crop(image: UIImage)
     }
 
     @Binding private var path: NavigationPath
@@ -21,33 +21,35 @@ public struct CameraView: View {
 
     public var body: some View {
         CameraContentView(path: $path)
-            .navigationDestination(for: Destination.self) { destination in
-                switch destination {
-                case .edit:
-                    EmptyView()
-                }
-            }
+    }
+    
+    public static func destinationView(for destination: Destination, path: Binding<NavigationPath>) -> some View {
+        switch destination {
+        case let .crop(image: image):
+            CropView(path: path, image: image)
+        }
     }
 }
 
 private struct CameraContentView: View {
     @Binding private var path: NavigationPath
-
+    
     fileprivate init(path: Binding<NavigationPath>) {
         _path = path
     }
-
+    
     fileprivate var body: some View {
         CameraBodyView { image in
-            if let image {
-                path.append(CameraView.Destination.edit(image: image))
+            guard let image else {
+                return
             }
+            path.append(CameraView.Destination.crop(image: image))
         }
     }
 }
 
 private struct CameraBodyView: UIViewControllerRepresentable {
-    private var completion: (UIImage?) -> Void
+    private let completion: (UIImage?) -> Void
 
     fileprivate init(completion: @escaping (UIImage?) -> Void) {
         self.completion = completion
@@ -75,17 +77,17 @@ private struct CameraBodyView: UIViewControllerRepresentable {
     fileprivate class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         private let parent: CameraBodyView
 
-        init(parent: CameraBodyView) {
+        fileprivate init(parent: CameraBodyView) {
             self.parent = parent
         }
 
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        fileprivate func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             let image = info[.originalImage] as! UIImage
             parent.completion(image)
             picker.dismiss(animated: true)
         }
 
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        fileprivate func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             parent.completion(nil)
             picker.dismiss(animated: true)
         }
@@ -96,6 +98,9 @@ private struct CameraBodyView: UIViewControllerRepresentable {
     #Preview {
         NavigationRootView { path in
             CameraView(path: path)
+                .navigationDestination(for: CameraView.Destination.self) { destination in
+                    CameraView.destinationView(for: destination, path: path)
+                }
         }
     }
 #endif

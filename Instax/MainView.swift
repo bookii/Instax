@@ -16,17 +16,22 @@ public struct MainView: View {
     @State private var tabType: TabType = .camera
 
     public var body: some View {
-        TabView(selection: $tabType) {
-            Color.white
-                .tabItem {
-                    Image(systemName: "camera")
-                    Text("カメラ")
-                }
-            Color.blue
-                .tabItem {
-                    Image(systemName: "photo.stack")
-                    Text("アルバム")
-                }
+        NavigationRootView { path in
+            TabView(selection: $tabType) {
+                CameraView(path: path)
+                    .tabItem {
+                        Image(systemName: "camera")
+                        Text("カメラ")
+                    }
+                Color.blue
+                    .tabItem {
+                        Image(systemName: "photo.stack")
+                        Text("アルバム")
+                    }
+            }
+            .navigationDestination(for: CameraView.Destination.self) { destination in
+                CameraView.destinationView(for: destination, path: path)
+            }
         }
     }
 }

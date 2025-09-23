@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6DCFB3692E8297B400258DEF /* SwiftFormat in Frameworks */ = {isa = PBXBuildFile; productRef = 6DCFB3682E8297B400258DEF /* SwiftFormat */; };
+		6DCFB3A62E829DAD00258DEF /* CropViewController in Frameworks */ = {isa = PBXBuildFile; productRef = 6DCFB3A52E829DAD00258DEF /* CropViewController */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,9 +34,22 @@
 		6DCFB31E2E828D5900258DEF /* InstaxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InstaxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6DCFB3A12E829B8E00258DEF /* Exceptions for "Instax" folder in "Instax" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6DCFB3062E828D5800258DEF /* Instax */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6DCFB3092E828D5800258DEF /* Instax */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6DCFB3A12E829B8E00258DEF /* Exceptions for "Instax" folder in "Instax" target */,
+			);
 			path = Instax;
 			sourceTree = "<group>";
 		};
@@ -57,6 +71,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6DCFB3692E8297B400258DEF /* SwiftFormat in Frameworks */,
+				6DCFB3A62E829DAD00258DEF /* CropViewController in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +133,7 @@
 			name = Instax;
 			packageProductDependencies = (
 				6DCFB3682E8297B400258DEF /* SwiftFormat */,
+				6DCFB3A52E829DAD00258DEF /* CropViewController */,
 			);
 			productName = Instax;
 			productReference = 6DCFB3072E828D5800258DEF /* Instax.app */;
@@ -203,6 +219,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6DCFB3672E8297B400258DEF /* XCRemoteSwiftPackageReference "SwiftFormat" */,
+				6DCFB3A42E829DAD00258DEF /* XCRemoteSwiftPackageReference "TOCropViewController" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6DCFB3082E828D5800258DEF /* Products */;
@@ -409,6 +426,7 @@
 				DEVELOPMENT_TEAM = SVKRAN4W6B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Instax/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -437,6 +455,7 @@
 				DEVELOPMENT_TEAM = SVKRAN4W6B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Instax/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -577,6 +596,14 @@
 				minimumVersion = 0.58.0;
 			};
 		};
+		6DCFB3A42E829DAD00258DEF /* XCRemoteSwiftPackageReference "TOCropViewController" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TimOliver/TOCropViewController.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -584,6 +611,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6DCFB3672E8297B400258DEF /* XCRemoteSwiftPackageReference "SwiftFormat" */;
 			productName = SwiftFormat;
+		};
+		6DCFB3A52E829DAD00258DEF /* CropViewController */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6DCFB3A42E829DAD00258DEF /* XCRemoteSwiftPackageReference "TOCropViewController" */;
+			productName = CropViewController;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
