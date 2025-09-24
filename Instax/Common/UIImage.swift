@@ -8,11 +8,11 @@
 import Foundation
 import UIKit
 
-extension UIImage {
+public extension UIImage {
     #if DEBUG
-    public static var mockImage: UIImage {
-        let url = URL(string: "https://i.gyazo.com/e94eeac7f1939804af6f80de69960b71.jpg")!
-        return UIImage(data: try! Data(contentsOf: url))!
-    }
+        static var mockImage: UIImage {
+            let url = URL(string: "https://i.gyazo.com/e94eeac7f1939804af6f80de69960b71.jpg")!
+            return UIImage(data: try! Data(contentsOf: url))!
+        }
     #endif
 }

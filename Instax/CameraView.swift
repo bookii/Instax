@@ -22,7 +22,7 @@ public struct CameraView: View {
     public var body: some View {
         CameraContentView(path: $path)
     }
-    
+
     public static func destinationView(for destination: Destination, path: Binding<NavigationPath>) -> some View {
         switch destination {
         case let .crop(image: image):
@@ -33,11 +33,11 @@ public struct CameraView: View {
 
 private struct CameraContentView: View {
     @Binding private var path: NavigationPath
-    
+
     fileprivate init(path: Binding<NavigationPath>) {
         _path = path
     }
-    
+
     fileprivate var body: some View {
         CameraBodyView { image in
             guard let image else {
