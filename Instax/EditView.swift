@@ -30,6 +30,7 @@ private struct EditContentView: View {
     @FocusState private var isFocused: Bool
     @State private var message: String = ""
     private let messageLimit = 10
+    @State private var isEditingCanvas: Bool = false
 
     fileprivate init(path: Binding<NavigationPath>, image: UIImage) {
         _path = path
@@ -40,28 +41,10 @@ private struct EditContentView: View {
         VStack(spacing: 0) {
             cardView
             VStack(spacing: 16) {
-                Button {
-                    isEditingMessage = true
-                    // TODO: PencilKit の終了
-                } label: {
-                    Text("メッセージの編集")
-                        .font(.custom("apricotJapanesefont", size: 24))
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity)
+                if !isEditingMessage, !isEditingCanvas {
+                    editMessageButton
+                    drawButton
                 }
-                .padding(.horizontal, 24)
-                .buttonStyle(.borderedProminent)
-                Button {
-                    isEditingMessage = false
-                    // TODO: PencilKit の起動
-                } label: {
-                    Text("書き込み")
-                        .font(.custom("apricotJapanesefont", size: 24))
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity)
-                }
-                .padding(.horizontal, 24)
-                .buttonStyle(.borderedProminent)
             }
             Spacer(minLength: 0)
         }
@@ -70,6 +53,21 @@ private struct EditContentView: View {
                 isFocused = true
             }
         }
+        .onChange(of: isFocused) { _, newValue in
+            if !newValue {
+                isEditingMessage = false
+            }
+        }
+        .background {
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    endEditingMessage()
+                    isEditingCanvas = false
+                }
+        }
+        .animation(.default, value: isEditingMessage)
+        .animation(.default, value: isEditingCanvas)
     }
 
     private var cardView: some View {
@@ -103,6 +101,44 @@ private struct EditContentView: View {
                 }
                 .frame(width: cardSize.width, height: cardSize.height)
             }
+            .overlay {
+                CanvasView(isEditing: $isEditingCanvas)
+                    .frame(width: cardSize.width, height: cardSize.height)
+            }
+            .onTapGesture {
+                endEditingMessage()
+            }
+    }
+    
+    private var editMessageButton: some View {
+        Button {
+            isEditingMessage = true
+        } label: {
+            Text("メッセージの編集")
+                .font(.custom("apricotJapanesefont", size: 24))
+                .padding(.vertical, 4)
+                .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 24)
+        .buttonStyle(.borderedProminent)
+    }
+    
+    private var drawButton: some View {
+        Button {
+            isEditingCanvas = true
+        } label: {
+            Text("描き込み")
+                .font(.custom("apricotJapanesefont", size: 24))
+                .padding(.vertical, 4)
+                .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 24)
+        .buttonStyle(.borderedProminent)
+    }
+    
+    private func endEditingMessage() {
+        isFocused = false
+        isEditingMessage = false
     }
 }
 
