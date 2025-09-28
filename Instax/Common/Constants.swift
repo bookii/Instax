@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Constants {
+public enum Constants {
     public static let instaxOuterAspectRatio = CGSize(width: 54, height: 86)
     public static let instaxInnerAspectRatio = CGSize(width: 46, height: 62)
 }

@@ -52,10 +52,8 @@ public final class CameraRepository: NSObject, CameraRepositoryProtocol {
     public let session = AVCaptureSession()
     public weak var delegate: CameraRepositoryDelegate?
 
-    private let photoDimensions = CMVideoDimensions(width: 270, height: 430)
     private var input: AVCaptureDeviceInput?
     private let output = AVCapturePhotoOutput()
-    private var isCapturing = false
 
     // MARK: - Lifecycle
 
