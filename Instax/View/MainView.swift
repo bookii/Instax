@@ -39,5 +39,6 @@ public struct MainView: View {
 #if DEBUG
     #Preview {
         MainView()
+            .environment(\.cameraRepository, MockCameraRepository())
     }
 #endif
