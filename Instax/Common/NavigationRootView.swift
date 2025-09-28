@@ -26,6 +26,10 @@ public struct NavigationRootView<Content: View>: View {
     #Preview {
         NavigationRootView { path in
             CameraView(path: path)
+                .navigationDestination(for: CameraView.Destination.self) { destination in
+                    CameraView.destinationView(for: destination, path: path)
+                }
         }
+        .environment(\.cameraRepository, MockCameraRepository())
     }
 #endif
