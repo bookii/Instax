@@ -26,7 +26,7 @@ public struct CropView: View {
             .navigationDestination(for: Destination.self) { destination in
                 switch destination {
                 case let .edit(image):
-                    EditView(path: $path, image: image)
+                    EditView(path: $path, photoImage: image)
                 }
             }
     }

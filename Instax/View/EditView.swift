@@ -6,46 +6,46 @@
 //
 
 import Combine
+import PencilKit
 import SwiftUI
 
 public struct EditView: View {
-    public enum Destination: Hashable {
-        case share(image: UIImage)
-    }
-
     @Binding private var path: NavigationPath
-    private let image: UIImage
+    private let photoImage: UIImage
 
-    public init(path: Binding<NavigationPath>, image: UIImage) {
+    public init(path: Binding<NavigationPath>, photoImage: UIImage) {
         _path = path
-        self.image = image
+        self.photoImage = photoImage
     }
 
     public var body: some View {
-        EditContentView(path: $path, image: image)
-            .navigationDestination(for: Destination.self) { destination in
-                switch destination {
-                case let .share(image):
-                    EmptyView()
-                }
-            }
+        EditContentView(path: $path, photoImage: photoImage)
+            .navigationTitle("写真の編集")
     }
 }
 
 private struct EditContentView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.displayScale) private var displayScale
     @Binding private var path: NavigationPath
-    private let image: UIImage
+    private let photoImage: UIImage
     @State private var cardSize: CGSize = .zero
+
     @State private var isEditingMessage: Bool = false
     @FocusState private var isFocused: Bool
     @State private var message: String = ""
     private let messageLimit = 10
-    @State private var isEditingCanvas: Bool = false
+    @State private var isRenderingMessage: Bool = false
 
-    fileprivate init(path: Binding<NavigationPath>, image: UIImage) {
+    private let pkCanvasView = PKCanvasView()
+    @State private var isEditingCanvas: Bool = false
+    @State private var renderedCanvasImage: UIImage?
+
+    @State private var renderedCardImage: UIImage?
+    @State private var isActivityViewPresented: Bool = false
+
+    fileprivate init(path: Binding<NavigationPath>, photoImage: UIImage) {
         _path = path
-        self.image = image
+        self.photoImage = photoImage
     }
 
     fileprivate var body: some View {
@@ -79,20 +79,22 @@ private struct EditContentView: View {
                 .ignoresSafeArea()
         }
         .colorScheme(.light)
-        .navigationTitle("写真の編集")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("戻る") {
-                    // TODO: dismiss してよいか確認する
-                    dismiss()
-                }
-            }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("保存") {
-                    saveImage()
+                Button("共有") {
+                    shareImage()
                 }
                 .fontWeight(.bold)
+                .disabled(message.isEmpty)
+            }
+        }
+        .sheet(isPresented: $isActivityViewPresented, onDismiss: {
+            renderedCanvasImage = nil
+            renderedCardImage = nil
+        }) {
+            if let renderedCardImage {
+                ActivityView(image: renderedCardImage)
             }
         }
         .onChange(of: isEditingMessage) { _, newValue in
@@ -114,33 +116,44 @@ private struct EditContentView: View {
                 VStack(spacing: 0) {
                     Spacer()
                         .frame(height: 8 * cardSize.height / Constants.instaxOuterAspectRatio.height)
-                    Image(uiImage: image)
+                    Image(uiImage: photoImage)
                         .resizable()
                         .scaledToFill()
                         .aspectRatio(Constants.instaxInnerAspectRatio, contentMode: .fit)
                         .frame(width: cardSize.width * Constants.instaxInnerAspectRatio.width / Constants.instaxOuterAspectRatio.width)
                         .clipped()
                     Spacer()
-                    TextField(text: $message, prompt: Text("メッセージを入力")) {}
-                        .multilineTextAlignment(.center)
-                        .font(.custom("apricotJapanesefont", size: cardSize.width / 10))
-                        .focused($isFocused)
-                        .submitLabel(.done)
-                        .onReceive(Just(message)) { _ in
-                            message = String(message.prefix(messageLimit))
+                    Group {
+                        if isRenderingMessage {
+                            Text(message)
+                        } else {
+                            TextField(text: $message, prompt: Text("メッセージを入力")) {}
+                                .focused($isFocused)
+                                .submitLabel(.done)
+                                .onReceive(Just(message)) { _ in
+                                    message = String(message.prefix(messageLimit))
+                                }
                         }
+                    }
+                    .multilineTextAlignment(.center)
+                    .font(.custom("apricotJapanesefont", size: cardSize.width / 10))
                     Spacer()
                 }
                 .frame(width: cardSize.width, height: cardSize.height)
             }
             .overlay {
-                CanvasView(isEditing: $isEditingCanvas)
-                    .frame(width: cardSize.width, height: cardSize.height)
+                if let renderedCanvasImage {
+                    Image(uiImage: renderedCanvasImage)
+                        .frame(width: cardSize.width, height: cardSize.height)
+                } else {
+                    CanvasView(pkCanvasView: pkCanvasView, isEditing: $isEditingCanvas)
+                        .frame(width: cardSize.width, height: cardSize.height)
+                }
             }
+            .compositingGroup()
             .onGeometryChange(for: CGSize.self, of: \.size) { size in
                 cardSize = size
             }
-            .compositingGroup()
             .onTapGesture {
                 endEditingMessage()
             }
@@ -179,18 +192,26 @@ private struct EditContentView: View {
         isEditingMessage = false
     }
 
-    private func saveImage() {
+    private func shareImage() {
+        isRenderingMessage = true
+        renderedCanvasImage = pkCanvasView.drawing.image(from: pkCanvasView.bounds, scale: displayScale)
         let renderer = ImageRenderer(content: cardView)
-        if let image = renderer.uiImage {
-            path.append(EditView.Destination.share(image: image))
+        renderer.proposedSize = .init(cardSize)
+        renderer.scale = displayScale
+        guard let renderedCardImage = renderer.uiImage else {
+            // TODO: エラー表示
+            return
         }
+        self.renderedCardImage = renderedCardImage
+        isActivityViewPresented = true
+        isRenderingMessage = false
     }
 }
 
 #if DEBUG
     #Preview {
         NavigationRootView { path in
-            EditView(path: path, image: .mockImage)
+            EditView(path: path, photoImage: .mockImage)
         }
     }
 #endif
