@@ -9,26 +9,27 @@ import PencilKit
 import SwiftUI
 
 public struct CanvasView: UIViewRepresentable {
-    private var canvasView = PKCanvasView()
+    private let pkCanvasView: PKCanvasView
     private let toolPicker = PKToolPicker()
 
     @Binding private var isEditing: Bool
 
-    public init(isEditing: Binding<Bool>) {
+    public init(pkCanvasView: PKCanvasView, isEditing: Binding<Bool>) {
+        self.pkCanvasView = pkCanvasView
         _isEditing = isEditing
     }
 
     public func makeUIView(context _: Context) -> PKCanvasView {
-        canvasView.drawingPolicy = .anyInput
-        canvasView.backgroundColor = .clear
-        canvasView.overrideUserInterfaceStyle = .light
-        canvasView.isUserInteractionEnabled = isEditing
+        pkCanvasView.drawingPolicy = .anyInput
+        pkCanvasView.backgroundColor = .clear
+        pkCanvasView.overrideUserInterfaceStyle = .light
+        pkCanvasView.isUserInteractionEnabled = isEditing
         if isEditing {
             // NOTE: AttributeGraph: cycle detected through attribute のメッセージは一旦無視する
             // ref: https://zenn.dev/st43/scraps/bb81fdb42d77d1
-            canvasView.becomeFirstResponder()
+            pkCanvasView.becomeFirstResponder()
         }
-        return canvasView
+        return pkCanvasView
     }
 
     public func updateUIView(_ uiView: PKCanvasView, context _: Context) {
@@ -44,6 +45,7 @@ public struct CanvasView: UIViewRepresentable {
 
 #if DEBUG
     #Preview {
+        @Previewable let pkCanvasView = PKCanvasView()
         @Previewable @State var isEditing = false
         VStack(spacing: 16) {
             Button(isEditing ? "編集終了" : "編集開始") {
@@ -51,7 +53,7 @@ public struct CanvasView: UIViewRepresentable {
             }
             Color.white
                 .overlay {
-                    CanvasView(isEditing: $isEditing)
+                    CanvasView(pkCanvasView: pkCanvasView, isEditing: $isEditing)
                 }
                 .compositingGroup()
                 .shadow(radius: 4)

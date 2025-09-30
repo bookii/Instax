@@ -15,6 +15,10 @@ public struct MainView: View {
 
     @State private var tabType: TabType = .camera
 
+    public init() {
+        UITabBar.appearance().barTintColor = .clear
+    }
+
     public var body: some View {
         NavigationRootView { path in
             TabView(selection: $tabType) {
@@ -25,8 +29,8 @@ public struct MainView: View {
                     }
                 Color.blue
                     .tabItem {
-                        Image(systemName: "photo.stack")
-                        Text("アルバム")
+                        Image(systemName: "person.fill")
+                        Text("マイページ")
                     }
             }
             .navigationDestination(for: CameraView.Destination.self) { destination in

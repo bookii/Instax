@@ -27,8 +27,8 @@ public struct CameraView: View {
 
     public static func destinationView(for destination: Destination, path: Binding<NavigationPath>) -> some View {
         switch destination {
-        case let .edit(image: image):
-            EditView(path: path, image: image)
+        case let .edit(image):
+            EditView(path: path, photoImage: image)
         }
     }
 }
