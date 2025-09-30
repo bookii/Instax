@@ -9,6 +9,10 @@ import Combine
 import SwiftUI
 
 public struct EditView: View {
+    public enum Destination: Hashable {
+        case share(image: UIImage)
+    }
+
     @Binding private var path: NavigationPath
     private let image: UIImage
 
@@ -19,10 +23,17 @@ public struct EditView: View {
 
     public var body: some View {
         EditContentView(path: $path, image: image)
+            .navigationDestination(for: Destination.self) { destination in
+                switch destination {
+                case let .share(image):
+                    EmptyView()
+                }
+            }
     }
 }
 
 private struct EditContentView: View {
+    @Environment(\.dismiss) private var dismiss
     @Binding private var path: NavigationPath
     private let image: UIImage
     @State private var cardSize: CGSize = .zero
@@ -41,6 +52,8 @@ private struct EditContentView: View {
         ScrollView {
             VStack(spacing: 0) {
                 cardView
+                    .shadow(radius: 4)
+                    .padding(.horizontal, 24)
                 Spacer().frame(height: 24)
                 VStack(spacing: 16) {
                     editMessageButton
@@ -66,6 +79,22 @@ private struct EditContentView: View {
                 .ignoresSafeArea()
         }
         .colorScheme(.light)
+        .navigationTitle("写真の編集")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("戻る") {
+                    // TODO: dismiss してよいか確認する
+                    dismiss()
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("保存") {
+                    saveImage()
+                }
+                .fontWeight(.bold)
+            }
+        }
         .onChange(of: isEditingMessage) { _, newValue in
             if newValue {
                 isFocused = true
@@ -81,11 +110,6 @@ private struct EditContentView: View {
     private var cardView: some View {
         Color.white
             .aspectRatio(Constants.instaxOuterAspectRatio, contentMode: .fit)
-            .onGeometryChange(for: CGSize.self, of: \.size) { size in
-                cardSize = size
-            }
-            .shadow(radius: 4)
-            .padding(.horizontal, 24)
             .overlay {
                 VStack(spacing: 0) {
                     Spacer()
@@ -113,6 +137,10 @@ private struct EditContentView: View {
                 CanvasView(isEditing: $isEditingCanvas)
                     .frame(width: cardSize.width, height: cardSize.height)
             }
+            .onGeometryChange(for: CGSize.self, of: \.size) { size in
+                cardSize = size
+            }
+            .compositingGroup()
             .onTapGesture {
                 endEditingMessage()
             }
@@ -149,6 +177,13 @@ private struct EditContentView: View {
     private func endEditingMessage() {
         isFocused = false
         isEditingMessage = false
+    }
+
+    private func saveImage() {
+        let renderer = ImageRenderer(content: cardView)
+        if let image = renderer.uiImage {
+            path.append(EditView.Destination.share(image: image))
+        }
     }
 }
 
