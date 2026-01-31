@@ -7,7 +7,7 @@
 
 import AVFoundation
 import Foundation
-import SwiftUICore
+import SwiftUI
 import UIKit
 
 extension EnvironmentValues {
